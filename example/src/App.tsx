@@ -1,10 +1,28 @@
 import React from 'react'
 
-import { ExampleComponent } from 'react-layer'
-import 'react-layer/dist/index.css'
+import createLayer from 'react-layer'
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  function handleClick() {
+    const layer = createLayer<{
+      name: string
+    }>(({layer, name}) => {
+      return (
+          <div>
+            <h1>I'm {name} !</h1>
+            <button onClick={layer!.destroy}>destroy</button>
+          </div>
+      )
+    })
+
+    layer.render({
+      name: 'Layer'
+    })
+  }
+
+  return (
+      <button onClick={handleClick}>create layer</button>
+  )
 }
 
 export default App
