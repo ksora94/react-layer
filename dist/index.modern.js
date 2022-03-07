@@ -1,8 +1,12 @@
 import React, { Suspense } from 'react';
 import ReactDom from 'react-dom';
 
-function createRoot(id = 'layer-root') {
-  let root = document.getElementById(id);
+function createRoot(id) {
+  if (id === void 0) {
+    id = 'layer-root';
+  }
+
+  var root = document.getElementById(id);
   if (root) return root;
   root = document.createElement('div');
   root.setAttribute('id', id);
@@ -10,22 +14,16 @@ function createRoot(id = 'layer-root') {
   return root;
 }
 function create(Component, root) {
-  const layer = {
+  var layer = {
     instance: null,
-
-    render() {},
-
+    render: function render() {},
     root: typeof root === 'string' ? createRoot(root) : root || createRoot(),
-
-    destroy() {
-      const {
-        root
-      } = layer;
+    destroy: function destroy() {
+      var root = layer.root;
       ReactDom.unmountComponentAtNode(root);
       layer.instance = null;
       if (root.parentNode && !root.children.length) root.parentNode.removeChild(root);
     }
-
   };
 
   function createElement(Comp, props) {
@@ -43,14 +41,18 @@ function create(Component, root) {
 
   if (Component instanceof Promise) {
     layer.render = function (props) {
-      const LazyComponent = React.lazy(() => Component);
-      const element = React.createElement(Suspense, {
+      var LazyComponent = React.lazy(function () {
+        return Component;
+      });
+      var element = React.createElement(Suspense, {
         fallback: null
       }, createElement(LazyComponent, props));
       return ReactDom.render(element, layer.root);
     };
 
-    return Component.then(() => layer);
+    return Component.then(function () {
+      return layer;
+    });
   } else {
     layer.render = function (props) {
       return ReactDom.render(createElement(Component, props), layer.root);

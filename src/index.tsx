@@ -32,24 +32,24 @@ export interface LayerType<P = {}> {
   /**
    * 组件挂载根节点
    */
-  root: HTMLElement
+  root: HTMLElement;
 }
 
 export type LayerComponentProps<P> = {
   layer?: LayerType<P>;
-} & P
+} & P;
 
-export type LC<P> = ComponentType<LayerComponentProps<P>>
-
-export function create<P>(
-    Component: LC<P>,
-    root?: HTMLElement | string,
-): LayerType<P>
+export type LC<P> = ComponentType<LayerComponentProps<P>>;
 
 export function create<P>(
-    Component: Promise<{default: LC<P>}>,
-    root?: HTMLElement | string,
-): Promise<LayerType<P>>
+  Component: LC<P>,
+  root?: HTMLElement | string
+): LayerType<P>;
+
+export function create<P>(
+  Component: Promise<{ default: LC<P> }>,
+  root?: HTMLElement | string
+): Promise<LayerType<P>>;
 
 /**
  * 创建浮层
@@ -57,22 +57,22 @@ export function create<P>(
  * @param root 挂载的根节点，默认#layer-root
  */
 export function create<P>(
-    Component: LC<P> | Promise<{default: LC<P>}>,
-    root?: HTMLElement | string,
+  Component: LC<P> | Promise<{ default: LC<P> }>,
+  root?: HTMLElement | string
 ): LayerType<P> | Promise<LayerType<P>> {
   const layer: LayerType<P> = {
     instance: null,
     render() {},
     root: typeof root === 'string' ? createRoot(root) : root || createRoot(),
     destroy() {
-      const {root} = layer;
+      const { root } = layer;
 
       ReactDom.unmountComponentAtNode(root);
       layer.instance = null;
       if (root.parentNode && !root.children.length)
         root.parentNode.removeChild(root);
     }
-  }
+  };
 
   function createElement(Comp: any, props: P) {
     function ref(layerComponent: ReactInstance | null) {
@@ -96,12 +96,12 @@ export function create<P>(
       );
 
       return ReactDom.render(element, layer.root);
-    }
+    };
 
     return Component.then(() => layer);
   } else {
     layer.render = function (props: P) {
-      return ReactDom.render(createElement(Component, props), layer.root)
+      return ReactDom.render(createElement(Component, props), layer.root);
     };
     return layer;
   }

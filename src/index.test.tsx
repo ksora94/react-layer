@@ -1,13 +1,13 @@
-import { create, createRoot } from './index'
+import { create, createRoot } from './index';
 
 describe('Layer.create', () => {
   it('is truthy', () => {
-    expect(create).toBeTruthy()
-  })
-})
+    expect(create).toBeTruthy();
+  });
+});
 
 describe('Layer.createRoot', () => {
   it('is truthy', () => {
-    expect(createRoot).toBeTruthy()
-  })
-})
+    expect(createRoot).toBeTruthy();
+  });
+});
