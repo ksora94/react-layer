@@ -1,4 +1,4 @@
-import React, {ComponentType, ReactInstance, Suspense} from 'react';
+import React, { ComponentType, ReactInstance, Suspense } from 'react';
 import ReactDom from 'react-dom';
 
 export function createRoot(id = 'layer-root'): HTMLElement {
@@ -71,22 +71,29 @@ export function create<P>(
       layer.instance = null;
       if (root.parentNode && !root.children.length)
         root.parentNode.removeChild(root);
-    },
-  };
-
-  function ref(layerComponent: ReactInstance | null) {
-    if (layerComponent) layer.instance = layerComponent;
+    }
   }
 
-  function createElement (Comp: any, props: P) {
-    return Comp.prototype && Comp.prototype.render ?
-        <Comp ref={ref} layer={layer} {...props} /> : <Comp layer={layer} {...props} />
+  function createElement(Comp: any, props: P) {
+    function ref(layerComponent: ReactInstance | null) {
+      if (layerComponent) layer.instance = layerComponent;
+    }
+
+    return Comp.prototype && Comp.prototype.render ? (
+      <Comp ref={ref} layer={layer} {...props} />
+    ) : (
+      <Comp layer={layer} {...props} />
+    );
   }
 
   if (Component instanceof Promise) {
     layer.render = function (props: P) {
       const LazyComponent = React.lazy<LC<P>>(() => Component);
-      const element = <Suspense fallback={null}>{createElement(LazyComponent, props)}</Suspense>;
+      const element = (
+        <Suspense fallback={null}>
+          {createElement(LazyComponent, props)}
+        </Suspense>
+      );
 
       return ReactDom.render(element, layer.root);
     }
@@ -94,8 +101,8 @@ export function create<P>(
     return Component.then(() => layer);
   } else {
     layer.render = function (props: P) {
-      return ReactDom.render(createElement(Component, props), layer.root);
-    }
+      return ReactDom.render(createElement(Component, props), layer.root)
+    };
     return layer;
   }
 }

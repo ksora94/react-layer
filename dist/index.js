@@ -29,11 +29,11 @@ function create(Component, root) {
     }
   };
 
-  function ref(layerComponent) {
-    if (layerComponent) layer.instance = layerComponent;
-  }
-
   function createElement(Comp, props) {
+    function ref(layerComponent) {
+      if (layerComponent) layer.instance = layerComponent;
+    }
+
     return Comp.prototype && Comp.prototype.render ? React__default.createElement(Comp, Object.assign({
       ref: ref,
       layer: layer
