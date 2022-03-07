@@ -15,13 +15,18 @@ export interface LayerType<P = {}> {
      * 销毁组件
      */
     destroy(): void;
+    /**
+     * 组件挂载根节点
+     */
+    root: HTMLElement;
 }
-export interface LayerComponentProps<P> {
+export declare type LayerComponentProps<P> = {
     layer?: LayerType<P>;
-}
+} & P;
+export declare type LC<P> = ComponentType<LayerComponentProps<P>>;
 /**
  * 创建浮层
  * @param Component 子组件引用
  * @param root 挂载的根节点，默认#layer-root
  */
-export default function create<P>(Component: ComponentType<P & LayerComponentProps<P>>, root?: HTMLElement): LayerType<P>;
+export default function create<P>(Component: LC<P>, root?: HTMLElement): LayerType<P>;

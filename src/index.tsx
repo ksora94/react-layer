@@ -28,11 +28,17 @@ export interface LayerType<P = {}> {
    * 销毁组件
    */
   destroy(): void;
+  /**
+   * 组件挂载根节点
+   */
+  root: HTMLElement
 }
 
-export interface LayerComponentProps<P> {
+export type LayerComponentProps<P> = {
   layer?: LayerType<P>;
-}
+} & P
+
+export type LC<P> = ComponentType<LayerComponentProps<P>>
 
 /**
  * 创建浮层
@@ -40,12 +46,13 @@ export interface LayerComponentProps<P> {
  * @param root 挂载的根节点，默认#layer-root
  */
 export default function create<P>(
-    Component: ComponentType<P & LayerComponentProps<P>>,
+    Component: LC<P>,
     root?: HTMLElement,
 ): LayerType<P> {
   const container = root || getLayerRoot();
   const layer: LayerType<P> = {
     instance: null,
+    root: container,
     render(props: P) {
       const layerElement = Component.prototype && Component.prototype.render ?
                   <Component ref={ref} layer={layer} {...props} /> : <Component layer={layer} {...props} />

@@ -1,12 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 
-function getLayerRoot(id) {
-  if (id === void 0) {
-    id = 'layer-root';
-  }
-
-  var layerRoot = document.getElementById(id);
+function getLayerRoot(id = 'layer-root') {
+  let layerRoot = document.getElementById(id);
   if (layerRoot) return layerRoot;
   layerRoot = document.createElement('div');
   layerRoot.setAttribute('id', id);
@@ -14,11 +10,13 @@ function getLayerRoot(id) {
   return layerRoot;
 }
 function create(Component, root) {
-  var container = root || getLayerRoot();
-  var layer = {
+  const container = root || getLayerRoot();
+  const layer = {
     instance: null,
-    render: function render(props) {
-      var layerElement = Component.prototype && Component.prototype.render ? React.createElement(Component, Object.assign({
+    root: container,
+
+    render(props) {
+      const layerElement = Component.prototype && Component.prototype.render ? React.createElement(Component, Object.assign({
         ref: ref,
         layer: layer
       }, props)) : React.createElement(Component, Object.assign({
@@ -26,11 +24,13 @@ function create(Component, root) {
       }, props));
       ReactDom.render(layerElement, container);
     },
-    destroy: function destroy() {
+
+    destroy() {
       ReactDom.unmountComponentAtNode(container);
       layer.instance = null;
       if (container.parentNode && !container.children.length) container.parentNode.removeChild(container);
     }
+
   };
 
   function ref(layerComponent) {

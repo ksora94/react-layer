@@ -19,6 +19,7 @@ function create(Component, root) {
   var container = root || getLayerRoot();
   var layer = {
     instance: null,
+    root: container,
     render: function render(props) {
       var layerElement = Component.prototype && Component.prototype.render ? React.createElement(Component, Object.assign({
         ref: ref,

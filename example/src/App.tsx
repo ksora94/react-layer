@@ -1,10 +1,10 @@
 import React from 'react'
 
-import createLayer from 'react-layer'
+import create from 'react-layer'
 
 const App = () => {
-  function handleClick() {
-    const layer = createLayer<{
+  function createLayer() {
+    const layer = create<{
       name: string
     }>(({layer, name}) => {
       return (
@@ -20,8 +20,15 @@ const App = () => {
     })
   }
 
+  function createAsyncLayer() {
+
+  }
+
   return (
-      <button onClick={handleClick}>create layer</button>
+      <div>
+        <button onClick={createLayer}>create layer</button>
+        <button onClick={createAsyncLayer}>create async Layer</button>
+      </div>
   )
 }
 
