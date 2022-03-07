@@ -45,7 +45,7 @@ export type LC<P> = ComponentType<LayerComponentProps<P>>
  * @param Component 子组件引用
  * @param root 挂载的根节点，默认#layer-root
  */
-export default function create<P>(
+export function create<P>(
     Component: LC<P>,
     root?: HTMLElement,
 ): LayerType<P> {

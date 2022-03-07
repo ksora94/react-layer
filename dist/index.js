@@ -43,6 +43,6 @@ function create(Component, root) {
   return layer;
 }
 
-exports.default = create;
+exports.create = create;
 exports.getLayerRoot = getLayerRoot;
 //# sourceMappingURL=index.js.map

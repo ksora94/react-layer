@@ -1,6 +1,6 @@
 import React from 'react'
 
-import create from 'react-layer'
+import {create} from 'react-layer'
 
 const App = () => {
   function createLayer() {

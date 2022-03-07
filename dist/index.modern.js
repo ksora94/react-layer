@@ -40,6 +40,5 @@ function create(Component, root) {
   return layer;
 }
 
-export default create;
-export { getLayerRoot };
+export { create, getLayerRoot };
 //# sourceMappingURL=index.modern.js.map
