@@ -1,7 +1,7 @@
-import { ExampleComponent } from '.'
+import { create } from '.'
 
-describe('ExampleComponent', () => {
+describe('Layer.create', () => {
   it('is truthy', () => {
-    expect(ExampleComponent).toBeTruthy()
+    expect(create).toBeTruthy()
   })
 })

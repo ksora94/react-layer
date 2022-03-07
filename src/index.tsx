@@ -1,14 +1,15 @@
-import React, {ComponentType, ReactInstance} from 'react';
+import React, {ComponentType, ReactInstance, Suspense} from 'react';
 import ReactDom from 'react-dom';
 
-export function getLayerRoot(id = 'layer-root'): HTMLElement {
-  let layerRoot = document.getElementById(id);
+export function createRoot(id = 'layer-root'): HTMLElement {
+  let root = document.getElementById(id);
 
-  if (layerRoot) return layerRoot;
-  layerRoot = document.createElement('div');
-  layerRoot.setAttribute('id', id);
-  document.body.appendChild(layerRoot);
-  return layerRoot;
+  if (root) return root;
+  root = document.createElement('div');
+  root.setAttribute('id', id);
+  document.body.appendChild(root);
+
+  return root;
 }
 
 export interface LayerType<P = {}> {
@@ -40,31 +41,36 @@ export type LayerComponentProps<P> = {
 
 export type LC<P> = ComponentType<LayerComponentProps<P>>
 
+export function create<P>(
+    Component: LC<P>,
+    root?: HTMLElement | string,
+): LayerType<P>
+
+export function create<P>(
+    Component: Promise<{default: LC<P>}>,
+    root?: HTMLElement | string,
+): Promise<LayerType<P>>
+
 /**
  * 创建浮层
  * @param Component 子组件引用
  * @param root 挂载的根节点，默认#layer-root
  */
 export function create<P>(
-    Component: LC<P>,
-    root?: HTMLElement,
-): LayerType<P> {
-  const container = root || getLayerRoot();
+    Component: LC<P> | Promise<{default: LC<P>}>,
+    root?: HTMLElement | string,
+): LayerType<P> | Promise<LayerType<P>> {
   const layer: LayerType<P> = {
     instance: null,
-    root: container,
-    render(props: P) {
-      const layerElement = Component.prototype && Component.prototype.render ?
-                  <Component ref={ref} layer={layer} {...props} /> : <Component layer={layer} {...props} />
-
-
-      ReactDom.render(layerElement, container);
-    },
+    render() {},
+    root: typeof root === 'string' ? createRoot(root) : root || createRoot(),
     destroy() {
-      ReactDom.unmountComponentAtNode(container);
+      const {root} = layer;
+
+      ReactDom.unmountComponentAtNode(root);
       layer.instance = null;
-      if (container.parentNode && !container.children.length)
-        container.parentNode.removeChild(container);
+      if (root.parentNode && !root.children.length)
+        root.parentNode.removeChild(root);
     },
   };
 
@@ -72,5 +78,24 @@ export function create<P>(
     if (layerComponent) layer.instance = layerComponent;
   }
 
-  return layer;
+  function createElement (Comp: any, props: P) {
+    return Comp.prototype && Comp.prototype.render ?
+        <Comp ref={ref} layer={layer} {...props} /> : <Comp layer={layer} {...props} />
+  }
+
+  if (Component instanceof Promise) {
+    layer.render = function (props: P) {
+      const LazyComponent = React.lazy<LC<P>>(() => Component);
+      const element = <Suspense fallback={null}>{createElement(LazyComponent, props)}</Suspense>;
+
+      return ReactDom.render(element, layer.root);
+    }
+
+    return Component.then(() => layer);
+  } else {
+    layer.render = function (props: P) {
+      return ReactDom.render(createElement(Component, props), layer.root);
+    }
+    return layer;
+  }
 }

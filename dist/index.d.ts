@@ -1,5 +1,5 @@
 import { ComponentType, ReactInstance } from 'react';
-export declare function getLayerRoot(id?: string): HTMLElement;
+export declare function createRoot(id?: string): HTMLElement;
 export interface LayerType<P = {}> {
     /**
      * 子组件实例
@@ -24,9 +24,7 @@ export declare type LayerComponentProps<P> = {
     layer?: LayerType<P>;
 } & P;
 export declare type LC<P> = ComponentType<LayerComponentProps<P>>;
-/**
- * 创建浮层
- * @param Component 子组件引用
- * @param root 挂载的根节点，默认#layer-root
- */
-export declare function create<P>(Component: LC<P>, root?: HTMLElement): LayerType<P>;
+export declare function create<P>(Component: LC<P>, root?: HTMLElement | string): LayerType<P>;
+export declare function create<P>(Component: Promise<{
+    default: LC<P>;
+}>, root?: HTMLElement | string): Promise<LayerType<P>>;
