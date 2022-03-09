@@ -21,7 +21,11 @@ const App = () => {
   }
 
   function createAsyncLayer() {
-
+    create(import('./AsyncComponent')).then(layer => {
+      layer.render({
+        name: 'Async Layer'
+      });
+    })
   }
 
   return (

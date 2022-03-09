@@ -1,44 +1,66 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDom from 'react-dom';
 
-function getLayerRoot(id = 'layer-root') {
-  let layerRoot = document.getElementById(id);
-  if (layerRoot) return layerRoot;
-  layerRoot = document.createElement('div');
-  layerRoot.setAttribute('id', id);
-  document.body.appendChild(layerRoot);
-  return layerRoot;
-}
-function create(Component, root) {
-  const container = root || getLayerRoot();
-  const layer = {
-    instance: null,
-    root: container,
-
-    render(props) {
-      const layerElement = Component.prototype && Component.prototype.render ? React.createElement(Component, Object.assign({
-        ref: ref,
-        layer: layer
-      }, props)) : React.createElement(Component, Object.assign({
-        layer: layer
-      }, props));
-      ReactDom.render(layerElement, container);
-    },
-
-    destroy() {
-      ReactDom.unmountComponentAtNode(container);
-      layer.instance = null;
-      if (container.parentNode && !container.children.length) container.parentNode.removeChild(container);
-    }
-
-  };
-
-  function ref(layerComponent) {
-    if (layerComponent) layer.instance = layerComponent;
+function createRoot(id) {
+  if (id === void 0) {
+    id = 'layer-root';
   }
 
-  return layer;
+  var root = document.getElementById(id);
+  if (root) return root;
+  root = document.createElement('div');
+  root.setAttribute('id', id);
+  document.body.appendChild(root);
+  return root;
+}
+function create(Component, root) {
+  var layer = {
+    instance: null,
+    render: function render() {},
+    root: typeof root === 'string' ? createRoot(root) : root || createRoot(),
+    destroy: function destroy() {
+      var root = layer.root;
+      ReactDom.unmountComponentAtNode(root);
+      layer.instance = null;
+      if (root.parentNode && !root.children.length) root.parentNode.removeChild(root);
+    }
+  };
+
+  function createElement(Comp, props) {
+    function ref(layerComponent) {
+      if (layerComponent) layer.instance = layerComponent;
+    }
+
+    return Comp.prototype && Comp.prototype.render ? React.createElement(Comp, Object.assign({
+      ref: ref,
+      layer: layer
+    }, props)) : React.createElement(Comp, Object.assign({
+      layer: layer
+    }, props));
+  }
+
+  if (Component instanceof Promise) {
+    layer.render = function (props) {
+      var LazyComponent = React.lazy(function () {
+        return Component;
+      });
+      var element = React.createElement(Suspense, {
+        fallback: null
+      }, createElement(LazyComponent, props));
+      return ReactDom.render(element, layer.root);
+    };
+
+    return Component.then(function () {
+      return layer;
+    });
+  } else {
+    layer.render = function (props) {
+      return ReactDom.render(createElement(Component, props), layer.root);
+    };
+
+    return layer;
+  }
 }
 
-export { create, getLayerRoot };
+export { create, createRoot };
 //# sourceMappingURL=index.modern.js.map

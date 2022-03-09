@@ -1,7 +1,13 @@
-import { ExampleComponent } from '.'
+import { create, createRoot } from './index';
 
-describe('ExampleComponent', () => {
+describe('Layer.create', () => {
   it('is truthy', () => {
-    expect(ExampleComponent).toBeTruthy()
-  })
-})
+    expect(create).toBeTruthy();
+  });
+});
+
+describe('Layer.createRoot', () => {
+  it('is truthy', () => {
+    expect(createRoot).toBeTruthy();
+  });
+});
